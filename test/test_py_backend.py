@@ -123,8 +123,7 @@ class TestPythonBackend(unittest.TestCase):
            {hasData() ? 10 : 'Hello world'}
         {/template}
         
-        // {template calculate5}{randomInt(10)}{/template}
-        {template calculate5}{0}{/template}
+        {template calculate5}{randomInt(10)}{/template}
         
         {template calculate6}{$x + $y}{/template}
 
@@ -364,7 +363,7 @@ class TestPythonBackend(unittest.TestCase):
                                              {}),
                          'Hello world')
         self.assertEqual(ttable.callTemplate('testForeach3', {'opernands': [1, 2, 3]}),
-                         '123')        
+                         '123')
         self.assertEqual(ttable.callTemplate('testForeach4',
                                              {'opernands': ["alpha", "beta", "gamma"]}),
                          'alpha+beta+gamma')

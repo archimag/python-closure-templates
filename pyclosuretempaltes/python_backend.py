@@ -18,11 +18,8 @@ import operator
 import math
 from random import randint
 from numbers import Number
-from functools import partial
 from StringIO import StringIO
 from contextlib import closing
-
-from lepl import List
 
 from parser import *
 
@@ -330,7 +327,7 @@ def makeExpressionHandler(expr):
 ####################################################################################################
 
 def writeTemplateAtom(obj, out):
-    if isinstance(obj, str):
+    if isText(obj):
         out.write(obj)
     else:
         out.write(str(obj))
@@ -510,7 +507,7 @@ def makeCommandHandler(obj, autoescape):
         return makeForHandler(obj, autoescape)
     elif isinstance(obj, Call):
         return makeCallHandler(obj, autoescape)
-    elif isinstance(obj, str):
+    elif isText(obj):
         def singleStringHandler(env, out, **kwargs):
             writeTemplateAtom(obj, out)
         return singleStringHandler

@@ -15,5 +15,5 @@
 # permissions and limitations under the License.
 
 from expression import parseExpression, Variable, DotRef, ARef, Operator, Funcall
-from commands import Namespace, Template, Substition, CodeBlock, Print, LiteralTag, If, Switch, Foreach, For, Call, parseSingleTemplate, parseNamespace, parseFile
+from commands import Namespace, Template, Substition, CodeBlock, Print, LiteralTag, If, Switch, Foreach, For, Call, parseSingleTemplate, parseNamespace, parseFile, isText
 

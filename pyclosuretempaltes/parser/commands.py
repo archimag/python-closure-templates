@@ -19,6 +19,9 @@ from lepl import *
 from expression import namedFields, simpleName, expressionLiteral, expression, variable, boolean, iW, oW
 import codecs
 
+def isText(text):
+    return isinstance(text, str) or isinstance(text, unicode)
+
 class CodeBlock(List): pass
 codeBlock = Delayed()
 
@@ -188,18 +191,18 @@ _call = (Drop('{call')
 class CodeBlock(List): pass
 
 def codeBlockHandler(args):
-    if args and isinstance(args[0], str):
+    if args and isText(args[0]):
         args[0] = args[0].lstrip()
 
-    if args and isinstance(args[-1], str):
+    if args and isText(args[-1]):
         args[-1] = args[-1].rstrip()
 
     for i in xrange(len(args)):
         if isinstance(args[i], Substition):
-            if i > 0 and isinstance(args[i-1], str):
+            if i > 0 and isText(args[i-1]):
                 args[i-1] = args[i-1].rstrip()
 
-            if i < (len(args) - 1) and isinstance(args[i+1], str):
+            if i < (len(args) - 1) and isText(args[i+1]):
                 args[i+1] = args[i+1].lstrip()
 
     return CodeBlock(filter(None, args))
@@ -260,4 +263,4 @@ def parseNamespace(text):
 
 def parseFile(path):
     with codecs.open(path, encoding='utf-8') as f:
-        return matcher.parse(f.read())
+        return parseNamespace(f.read())
