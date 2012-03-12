@@ -86,35 +86,45 @@ class Env(object):
 ####################################################################################################
 
 def escapeHtml(text):
-    out = StringIO()
+    if isText(text):
+        out = StringIO()
 
-    for ch in text:
-        if ch == '<':
-            out.write('&lt;')
-        elif ch == '>':
-            out.write('&gt;')
-        elif ch == '"':
-            out.write('&quot;')
-        elif ch =="'":
-            out.write('&#039;')
-        elif ch == '&':
-            out.write('&amp;')
-        else:
-            out.write(ch)
+        for ch in text:
+            if ch == '<':
+                out.write('&lt;')
+            elif ch == '>':
+                out.write('&gt;')
+            elif ch == '"':
+                out.write('&quot;')
+            elif ch =="'":
+                out.write('&#039;')
+            elif ch == '&':
+                out.write('&amp;')
+            else:
+                out.write(ch)
 
-    return out.getvalue()
+        return out.getvalue()
+    elif text is None:
+        return ''
+    else:
+        return str(text)
 
 def encodeString(text, notEncode):
-    out = StringIO()
+    if isText(text):
+        out = StringIO()
 
-    for ch in text:
-        if (chr(0) <= ch <= chr(9)) or ('a' <= ch <= 'z') or ('A' <= ch <= 'Z') or (ch in notEncode):
-            out.write(str(ch))
-        else:
-            for octet in ch.encode('utf-8'):
-                out.write('%%%02X' % ord(octet))
+        for ch in text:
+            if (chr(0) <= ch <= chr(9)) or ('a' <= ch <= 'z') or ('A' <= ch <= 'Z') or (ch in notEncode):
+                out.write(str(ch))
+            else:
+                for octet in ch.encode('utf-8'):
+                    out.write('%%%02X' % ord(octet))
 
-    return out.getvalue()
+        return out.getvalue()
+    elif text is None:
+        return ''
+    else:
+        return str(text)
 
 def encodeUri(text):
     return encodeString(text, '~!@#$&*()=:/,;?+\'')
@@ -166,7 +176,7 @@ def genericAdd(arg1, arg2):
     if isinstance(arg1, Number) and isinstance(arg2, Number):
         return arg1 + arg2
     else:
-        return str(arg1) + str(arg2)
+        return unicode(arg1) + unicode(arg2)
 
 def makeOperatorHandler(name, args):
     if len(args) == 1:
@@ -329,6 +339,8 @@ def makeExpressionHandler(expr):
 def writeTemplateAtom(obj, out):
     if isText(obj):
         out.write(obj)
+    elif obj is None:
+        pass
     else:
         out.write(str(obj))
 
@@ -365,7 +377,7 @@ def makePrintHandler(print_, autoescape):
 
     if escapeHandler:
         def printHandler(env, out, **kwargs):
-            writeTemplateAtom(escapeHandler(str(exprHandler(env))), out)
+            writeTemplateAtom(escapeHandler(exprHandler(env)), out)
     else:
         def printHandler(env, out, **kwargs):
             writeTemplateAtom(exprHandler(env), out)
@@ -493,7 +505,7 @@ def makeCallHandler(call_, autoescape):
 def makeCommandHandler(obj, autoescape):
     if isinstance(obj, CodeBlock):
         return makeCodeBlockHandler(obj, autoescape)
-    if isinstance(obj, LiteralTag):
+    elif isinstance(obj, LiteralTag):
         return makeLiteralHandler(obj, autoescape)
     elif isinstance(obj, Print):
         return makePrintHandler(obj, autoescape)

@@ -27,6 +27,8 @@ class TestExpressionParser(unittest.TestCase):
 
     def testLiterals(self):
         self.assertEqual(parseExpression("'Hello world'"), 'Hello world')
+        print parseExpression("''")
+        self.assertEqual(parseExpression("''"), '')
         self.assertEqual(parseExpression("5"), 5)
         self.assertEqual(parseExpression("3.14"), 3.14)
 

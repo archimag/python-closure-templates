@@ -14,7 +14,7 @@
 # implied.  See the License for the specific language governing
 # permissions and limitations under the License.
 
-import re
+import json
 from StringIO import StringIO
 from contextlib import closing
 
@@ -22,7 +22,7 @@ from parser import *
 from lepl import List
 
 
-symbolCounter = 1;
+symbolCounter = 1
 
 ####################################################################################################
 # helpers
@@ -52,11 +52,8 @@ class LocalVar:
         if not exc_type:
             self.localVars.pop()
 
-def prepareJSString(text):
-    if isText(text):
-        return re.sub('"', '\\"', re.sub("'", "\\'", text))
-    else:
-        return text
+def js(text):
+    return json.dumps(text)
 
 ####################################################################################################
 # expressions
@@ -145,7 +142,7 @@ def writeFuncall(expr, namespace, localVars, out):
     elif name == 'round':
         writeSimpleFuncall('%s.$round$' % namespace)
     else:
-        writeSimpleFuncall(name)
+        writeSimpleFuncall('Math.%s' % name)
 
 def writeExpression(expr, namespace, localVars, out):
     if isinstance(expr, Variable):
@@ -158,10 +155,8 @@ def writeExpression(expr, namespace, localVars, out):
         writeOperator(expr, namespace, localVars, out)
     elif isinstance(expr, Funcall):
         writeFuncall(expr, namespace, localVars, out)
-    elif isText(expr):
-        out.write("'%s'" % prepareJSString(expr))
     else:
-        out.write(str(expr))
+        out.write(js(expr))
 
 ####################################################################################################
 # commands
@@ -203,7 +198,7 @@ def writeCodeBlock(block, autoescape, namespace, localVars, indentLevel, out):
 
 def writeLiteral(literal, autoescape, namespace, localVars, indentLevel, out):
     writeIndent(indentLevel, out)
-    out.write('$result$.push("%s");\n' % prepareJSString(literal.text))
+    out.write('$result$.push(%s);\n' % js(literal.text))
 
 
 # Print
@@ -296,7 +291,7 @@ def writeForeach(foreach_, autoescape, namespace, localVars, indentLevel, out):
     counterName = '$counter_%s$' % varName
 
     writeIndent(indentLevel, out)
-    out.write('%s = ' % seqName)
+    out.write('var %s = ' % seqName)
     writeExpression(foreach_.expr, namespace, localVars, out)
     out.write(';\n')
 
@@ -457,8 +452,7 @@ def writeCommand(cmd, autoescape, namespace, localVars, indentLevel, out):
         writeIndent(indentLevel, out)
         out.write('$result$.push')
         with PrintParenthesis(out):
-            with PrintParenthesis(out, '""'):
-                out.write(prepareJSString(cmd))
+            out.write(js(cmd))
         out.write(';\n')
 
 ####################################################################################################
@@ -522,7 +516,7 @@ def writeNamespace(namespace, out):
 
     # objectFromPrototype
     out.write('\n%s.%s = function(obj) {\n' % (name, '$objectFromPrototype$'))
-    out.write('    C = function () {}\n')
+    out.write('    function C () {}\n')
     out.write('    C.prototype = obj;\n')
     out.write('    return new C;')
     out.write('\n};\n')

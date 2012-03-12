@@ -42,7 +42,7 @@ comment = simpleComment | multilineComment
 def simpleTextHandler(args):
     return re.sub('\\s+', ' ', args[0])
 
-simpleText =  Add(Or(Drop(comment), AnyBut("{}"))[1:]) > simpleTextHandler
+simpleText =  Add(Or(Drop(iW & comment), AnyBut("{}"))[1:]) > simpleTextHandler
 
 # substition
 

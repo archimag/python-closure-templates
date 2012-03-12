@@ -75,7 +75,7 @@ stringChar = Or(reverseSolidus,
                 formFeed,
                 AnyBut("'"))
 
-string = Drop("'") + stringChar[0:] + Drop("'")
+string = Substitute("''", '') | (Drop("'") + stringChar[0:] + Drop("'"))
 
 # number literal
 
