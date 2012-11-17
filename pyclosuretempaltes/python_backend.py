@@ -433,7 +433,8 @@ def makeForeachHandler(foreach_, autoescape):
     varName = foreach_.var.name
     exprHandler = makeExpressionHandler(foreach_.expr)
     bodyHandler = makeCommandHandler(foreach_.code, autoescape)
-    
+
+    emptyHandler = None
     if foreach_.ifEmptyCode:
         emptyHandler = makeCommandHandler(foreach_.ifEmptyCode, autoescape)
 
@@ -448,7 +449,7 @@ def makeForeachHandler(foreach_, autoescape):
                 extra[varName] = value
                 extra[counterName] = i
                 bodyHandler(Env(env, extra), out, **kwargs)
-        else:
+        elif emptyHandler:
             emptyHandler(env, out, **kwargs)
 
     return foreachHandler
